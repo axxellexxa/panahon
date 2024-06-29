@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'SplashScreen.dart';
 import 'QuickViewScreen.dart';
-import 'ModelsScreen.dart';
-import 'ClimateScreen.dart';
-import 'ReportsScreen.dart';
+// import 'ModelsScreen.dart';
+// import 'ClimateScreen.dart';
+// import 'ReportsScreen.dart';
 
 void main() => runApp(MyApp());
 
@@ -10,12 +11,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Weather App',
+      title: 'Panahon',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.orange,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomePage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => SplashScreen(),
+        '/home': (context) => HomePage(),
+      },
     );
   }
 }
@@ -28,10 +33,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   final List<Widget> _children = [
+    // Uncomment and add your screen widgets here
     QuickViewScreen(),
-    ModelsScreen(),
-    ClimateScreen(),
-    ReportsScreen(),
+    // ModelsScreen(),
+    // ClimateScreen(),
+    // ReportsScreen(),
   ];
 
   @override
@@ -40,14 +46,15 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text('Panahon'),
       ),
-      body: _children[_currentIndex],
+      body: _children.isNotEmpty ? _children[_currentIndex] : Container(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (int index) {
           setState(() {
-            _currentIndex = index;
+            _currentIndex = index.clamp(0, _children.length - 1); // Clamp index to valid range
           });
         },
+
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.thermostat),
