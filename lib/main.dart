@@ -51,10 +51,11 @@ class _HomePageState extends State<HomePage> {
         currentIndex: _currentIndex,
         onTap: (int index) {
           setState(() {
-            _currentIndex = index.clamp(0, _children.length - 1); // Clamp index to valid range
+            _currentIndex = index.clamp(0, _children.length - 1);
           });
         },
-
+        selectedItemColor: Colors.orange, // Set the selected item color
+        unselectedItemColor: Colors.grey, // Set the unselected item color
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.thermostat),

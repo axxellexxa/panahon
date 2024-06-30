@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'weather_api.dart'; // Adjust import path as necessary
+import 'weather_api.dart'; // Import your WeatherMapWidget.dart file
 
 class QuickViewScreen extends StatefulWidget {
   @override
@@ -13,7 +13,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
       appBar: AppBar(
         title: Text('Quick View'),
       ),
-      body: WeatherMapWidget(), // Display WeatherMapWidget
+      body: WeatherAPI(), // Display WeatherMapWidget
     );
   }
 }

@@ -4,12 +4,12 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
-class WeatherMapWidget extends StatefulWidget {
+class WeatherAPI extends StatefulWidget {
   @override
-  _WeatherMapWidgetState createState() => _WeatherMapWidgetState();
+  _WeatherAPIState createState() => _WeatherAPIState();
 }
 
-class _WeatherMapWidgetState extends State<WeatherMapWidget> {
+class _WeatherAPIState extends State<WeatherAPI> {
   double temperature = 0.0;
   double rain = 0.0;
   double windSpeed = 0.0;
@@ -24,9 +24,9 @@ class _WeatherMapWidgetState extends State<WeatherMapWidget> {
 
   void fetchWeatherData(double lat, double lon) async {
     // Replace with your actual weather API integration logic
-    String apiKey = 'your_api_key_here';
-    String apiUrl =
-        'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey';
+    /*String apiKey = '82febee1d40b64392c1d7d487e63b875';*/
+    String apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=aa1213cda7a7e50aa20ff921ccc6c25e';
+        /*'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey';*/
 
     // Example HTTP request using http package
     var response = await http.get(Uri.parse(apiUrl));
@@ -46,17 +46,17 @@ class _WeatherMapWidgetState extends State<WeatherMapWidget> {
   @override
   Widget build(BuildContext context) {
     return FlutterMap(
-      options: MapOptions(
+/*      options: MapOptions(
         center: LatLng(14.5995, 120.9842), // Initial map center (Manila, Philippines)
         zoom: 10.0,
-      ),
-      layers: [
-        TileLayerOptions(
+      ),*/
+      children: [
+        TileLayer(
           urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
           subdomains: ['a', 'b', 'c'],
         ),
         // Custom Overlay for weather data (e.g., circles or custom markers for rain, wind speed, etc.)
-        CircleLayerOptions(
+        CircleLayer(
           circles: [
             CircleMarker(
               point: LatLng(14.5995, 120.9842),

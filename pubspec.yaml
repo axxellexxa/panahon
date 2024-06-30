@@ -55,7 +55,7 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - build/flutter_assets/images/MO_logo.png
+    - build\asset\images\MO_logo.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
