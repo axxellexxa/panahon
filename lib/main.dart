@@ -5,9 +5,11 @@ import 'QuickViewScreen.dart';
 // import 'ClimateScreen.dart';
 // import 'ReportsScreen.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,14 +20,16 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => SplashScreen(),
-        '/home': (context) => HomePage(),
+        '/': (context) => const SplashScreen(),
+        '/home': (context) => const HomePage(),
       },
     );
   }
 }
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -34,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   final List<Widget> _children = [
     // Uncomment and add your screen widgets here
-    QuickViewScreen(),
+    const QuickViewScreen(),
     // ModelsScreen(),
     // ClimateScreen(),
     // ReportsScreen(),
@@ -44,7 +48,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Panahon'),
+        title: const Text('Panahon'),
       ),
       body: _children.isNotEmpty ? _children[_currentIndex] : Container(),
       bottomNavigationBar: BottomNavigationBar(
@@ -56,7 +60,7 @@ class _HomePageState extends State<HomePage> {
         },
         selectedItemColor: Colors.orange, // Set the selected item color
         unselectedItemColor: Colors.grey, // Set the unselected item color
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.thermostat),
             label: 'Quick View',
