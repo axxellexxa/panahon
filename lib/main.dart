@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'SplashScreen.dart';
 import 'QuickViewScreen.dart';
-// import 'ModelsScreen.dart';
-// import 'ClimateScreen.dart';
-// import 'ReportsScreen.dart';
+import 'ModelsScreen.dart';
+import 'ClimateScreen.dart';
+import 'ReportsScreen.dart';
 
 void main() => runApp(const MyApp());
 
@@ -39,9 +39,9 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _children = [
     // Uncomment and add your screen widgets here
     const QuickViewScreen(),
-    // ModelsScreen(),
-    // ClimateScreen(),
-    // ReportsScreen(),
+    const ModelsScreen(),
+    const ClimateScreen(),
+    const ReportsScreen(),
   ];
 
   @override
