@@ -51,29 +51,30 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Panahon'),
       ),
       body: _children.isNotEmpty ? _children[_currentIndex] : Container(),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (int index) {
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        indicatorColor: Colors.indigo[100],
+        onDestinationSelected: (int index) {
           setState(() {
             _currentIndex = index.clamp(0, _children.length - 1);
           });
         },
-        selectedItemColor: Colors.orange, // Set the selected item color
-        unselectedItemColor: Colors.grey, // Set the unselected item color
-        items: const [
-          BottomNavigationBarItem(
+        // selectedItemColor: Colors.orange, // Set the selected item color
+        // unselectedItemColor: Colors.grey, // Set the unselected item color
+        destinations: const [
+          NavigationDestination(
             icon: Icon(Icons.thermostat),
             label: 'Quick View',
           ),
-          BottomNavigationBarItem(
+          NavigationDestination(
             icon: Icon(Icons.bar_chart),
             label: 'Models',
           ),
-          BottomNavigationBarItem(
+          NavigationDestination(
             icon: Icon(Icons.cloud),
             label: 'Climate',
           ),
-          BottomNavigationBarItem(
+          NavigationDestination(
             icon: Icon(Icons.article),
             label: 'Reports',
           ),
