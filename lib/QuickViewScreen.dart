@@ -30,11 +30,11 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
     return Scaffold(
       body: Column(
         children: [
-          FutureBuilder<List>(
+          FutureBuilder<dynamic>(
               future: weatherData,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return Text(snapshot.data![0]["id"].toString());
+                  return Text(snapshot.data!["name"].toString());
                 } else if (snapshot.hasError) {
                   return Text('${snapshot.error}');
                 }

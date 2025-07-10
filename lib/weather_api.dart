@@ -16,17 +16,17 @@ class WeatherAPI {
 
   List<dynamic> data = [];
 
-  Future<List<dynamic>> fetchWeatherData(String location) async {
+  Future<dynamic> fetchWeatherData(String location) async {
 
     // Example HTTP request using http package
     var response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
       data = jsonDecode(response.body);
-      return data;
+      var curLocationData = data.firstWhere((element) => element["name"] == location);
+      return curLocationData;
     } else {
       print('Failed to fetch weather data');
     }
     return [];
   }
-// var curLocationData = data.firstWhere((element) => element["name"] == location);
 }
