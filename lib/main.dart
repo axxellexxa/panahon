@@ -18,9 +18,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.orange,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: '/',
+      initialRoute: '/home',
       routes: {
-        '/': (context) => const SplashScreen(),
+        '/splash': (context) => const SplashScreen(),
         '/home': (context) => const HomePage(),
       },
     );
@@ -45,22 +45,26 @@ class _HomePageState extends State<HomePage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    print("HomePage state");
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print("HomePage build");
     return Scaffold(
       appBar: AppBar(
         title: const Text('Panahon'),
       ),
-      body: _children.isNotEmpty ? _children[_currentIndex] : Container(),
+      body: _children[_currentIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        indicatorColor: Colors.indigo[100],
         onDestinationSelected: (int index) {
           setState(() {
             _currentIndex = index.clamp(0, _children.length - 1);
           });
         },
-        // selectedItemColor: Colors.orange, // Set the selected item color
-        // unselectedItemColor: Colors.grey, // Set the unselected item color
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.thermostat),
