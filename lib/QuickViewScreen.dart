@@ -21,7 +21,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
     super.initState();
     print("quick view state");
     // print(weather.data[0] ?? "no data =============");
-    weatherData = weather.fetchWeatherData("Manila Observatory");
+    weather.initializeData();
   }
 
   @override
@@ -30,16 +30,39 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
     return Scaffold(
       body: Column(
         children: [
-          FutureBuilder<dynamic>(
-              future: weatherData,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Text(snapshot.data!["name"].toString());
-                } else if (snapshot.hasError) {
-                  return Text('${snapshot.error}');
-                }
-                return const CircularProgressIndicator();
-              }),
+          // FutureBuilder<dynamic>(
+          //     future: weather.getData("Manila Observatory", "name"),
+          //     builder: (context, snapshot) {
+          //       if (snapshot.hasData) {
+          //         return Text(snapshot.data!.toString());
+          //       } else if (snapshot.hasError) {
+          //         return Text('${snapshot.error}');
+          //       }
+          //       return const CircularProgressIndicator();
+          //     }),
+          FutureBuilder<List<DropdownMenuEntry>>(
+            future: weather.getLocations(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return DropdownMenu(
+                  width: 500,
+                  menuHeight: 200,
+                  label: Text("Location"),
+                  dropdownMenuEntries: snapshot.data!,
+                  initialSelection: "Manila Observatory", // Assuming Manila Observatory data is always available
+                );
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+              return const CircularProgressIndicator();
+            }),
+          // DropdownMenu(
+          //   dropdownMenuEntries: <DropdownMenuEntry<String>>[
+          //     DropdownMenuEntry(value: "Manila Observatory", label: "Manila Observatory"),
+          //     DropdownMenuEntry(value: "Mirador Jesuit Villa", label: "Mirador Jesuit Villa")
+          //   ],
+          //   initialSelection: "Manila Observatory",
+          // ),
           Expanded(
             child: Stack(
               alignment: AlignmentDirectional.center,
