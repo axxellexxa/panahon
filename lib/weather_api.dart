@@ -13,6 +13,7 @@ class WeatherAPI {
   double pressure = 0.0;
   // String apiKey = '82febee1d40b64392c1d7d487e63b875';
   String apiUrl = 'https://panahon.observatory.ph/data/api/v1/observations/latest';
+  String selectedLocation = "Manila Observatory"; // TODO: should default to closest location
 
   List<dynamic> data = [];
 
@@ -27,8 +28,12 @@ class WeatherAPI {
     }
   }
 
-  Future<dynamic> getData(String location, String field) async {
-    return data.firstWhere((element) => element[field] == location, orElse: () => {"${field}": null})[field];
+  Future<String> getDataField(String location, String field) async {
+    return data.firstWhere((element) => element["name"] == location, orElse: () => {field: null})[field].toString();
+  }
+
+  Future<Map<String, dynamic>> getData(String location) async {
+    return data.firstWhere((element) => element["name"] == location, orElse: () => {}); // TODO: make custom Map to include calculated values
   }
 
   Future<List<DropdownMenuEntry>> getLocations() async {

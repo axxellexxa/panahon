@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'weather_api.dart'; // Import your WeatherMapWidget.dart file
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'WeatherDataSection.dart';
 
 class QuickViewScreen extends StatefulWidget {
   const QuickViewScreen({super.key});
@@ -15,31 +16,34 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
 
   var weather = WeatherAPI();
   var weatherData;
+  String selectedLocation = "Manila Observatory";
 
   @override
   void initState() {
     super.initState();
-    print("quick view state");
     // print(weather.data[0] ?? "no data =============");
     weather.initializeData();
   }
 
   @override
   Widget build(BuildContext context) {
-    print("quick view build");
     return Scaffold(
       body: Column(
         children: [
           // FutureBuilder<dynamic>(
-          //     future: weather.getData("Manila Observatory", "name"),
-          //     builder: (context, snapshot) {
-          //       if (snapshot.hasData) {
-          //         return Text(snapshot.data!.toString());
-          //       } else if (snapshot.hasError) {
-          //         return Text('${snapshot.error}');
-          //       }
-          //       return const CircularProgressIndicator();
-          //     }),
+          //   future: weather.getData(selectedLocation, "id"),
+          //   builder: (context, snapshot) {
+          //     if (snapshot.hasData && snapshot.data != "null") {
+          //         return Text(snapshot.data!);
+          //     } else if (snapshot.hasError) {
+          //       return Text('${snapshot.error}');
+          //     }
+          //     return Padding(
+          //       padding: const EdgeInsets.all(8.0),
+          //       child: const CircularProgressIndicator(),
+          //     );
+          //   }
+          // ),
           FutureBuilder<List<DropdownMenuEntry>>(
             future: weather.getLocations(),
             builder: (context, snapshot) {
@@ -47,22 +51,21 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                 return DropdownMenu(
                   width: 500,
                   menuHeight: 200,
-                  label: Text("Location"),
+                  hintText: "Location",
                   dropdownMenuEntries: snapshot.data!,
-                  initialSelection: "Manila Observatory", // Assuming Manila Observatory data is always available
+                  initialSelection: "Manila Observatory", // TODO: Fix this
+                  onSelected: (location){
+                    setState(() {
+                      selectedLocation = location;
+                      weather.selectedLocation = location;
+                    });
+                  },
                 );
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');
               }
               return const CircularProgressIndicator();
             }),
-          // DropdownMenu(
-          //   dropdownMenuEntries: <DropdownMenuEntry<String>>[
-          //     DropdownMenuEntry(value: "Manila Observatory", label: "Manila Observatory"),
-          //     DropdownMenuEntry(value: "Mirador Jesuit Villa", label: "Mirador Jesuit Villa")
-          //   ],
-          //   initialSelection: "Manila Observatory",
-          // ),
           Expanded(
             child: Stack(
               alignment: AlignmentDirectional.center,
@@ -78,9 +81,11 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                 ),
                 children: [
                   TileLayer(
+                    // urlTemplate:
+                    //     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    // subdomains: const ['a', 'b', 'c'],
                     urlTemplate:
-                        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    subdomains: const ['a', 'b', 'c'],
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // TODO: take care of tile use policy
                   ),
                   // Custom Overlay for weather data (e.g., circles or custom markers for rain, wind speed, etc.)
                   CircleLayer(
@@ -95,6 +100,10 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                     ],
                   ),
                 ],
+              ),
+              Positioned.fill(
+                  bottom: 8,
+                  child: WeatherDataSection(weatherAPI: weather)
               ),
             ]),
           ),

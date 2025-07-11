@@ -47,12 +47,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    print("HomePage state");
   }
 
   @override
   Widget build(BuildContext context) {
-    print("HomePage build");
     return Scaffold(
       appBar: AppBar(
         title: const Text('Panahon'),
