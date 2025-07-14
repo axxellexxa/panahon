@@ -25,7 +25,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
 
   @override
   Widget build(BuildContext context) {
-    weather.initializeData();
+    // weather.initializeData();
     switch (weatherDataView) {
       case "Rain":
         primaryObservation = "rain";
@@ -38,15 +38,15 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
         primaryObservation = "temp";
         primaryUnit = "°C";
         secondaryText = "Feels like\n";
-        secondaryObservation = "rh";
-        secondaryUnit = "%"; // TODO: calculate heat index
+        secondaryObservation = "hi";
+        secondaryUnit = "°C";
         break;
       case "Wind":
         primaryObservation = "wspd";
         primaryUnit = "m/s";
         secondaryText = "Direction\n";
         secondaryObservation = "wdir";
-        secondaryUnit = "N"; // TODO: calculate direction
+        secondaryUnit = "";
         break;
       case "Pressure":
         primaryObservation = "mslp";
@@ -120,7 +120,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 16, horizontal: 16),
                         child: FutureBuilder(
-                            future: weather.getData(weather.selectedLocation),
+                            future: weather.getData2(weather.selectedLocation),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 return RichText(
@@ -130,7 +130,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                                         ),
                                         children: [
                                       TextSpan(
-                                        text: snapshot.data!["obs"][primaryObservation]
+                                        text: snapshot.data![primaryObservation]
                                             .toString(),
                                         style: TextStyle(fontSize: 36),
                                       ),
@@ -164,7 +164,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                         padding:
                             EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                         child: FutureBuilder(
-                            future: weather.getData(weather.selectedLocation),
+                            future: weather.getData2(weather.selectedLocation),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 return RichText(
@@ -180,7 +180,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                                       TextSpan(
                                         children: [
                                           TextSpan(
-                                            text: snapshot.data!["obs"][secondaryObservation].toString(),
+                                            text: snapshot.data![secondaryObservation],
                                             style: TextStyle(fontSize: 24),
                                           ),
                                           TextSpan(

@@ -22,11 +22,28 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
   void initState() {
     super.initState();
     // print(weather.data[0] ?? "no data =============");
+    print("intialized");
     weather.initializeData();
   }
 
   @override
   Widget build(BuildContext context) {
+    List<CircleMarker> circles = [
+      CircleMarker(
+        point: const LatLng(14.5995, 120.9842),
+        color: Colors.blue.withAlpha(125),
+        radius: 5, // Adjust radius based on rain intensity
+        borderColor: Colors.indigo,
+        borderStrokeWidth: 2,
+      ),
+      CircleMarker(
+        point: const LatLng(14.635350998990003, 121.07793937540339),
+        color: Colors.blue.withAlpha(125),
+        radius: 5, // Adjust radius based on rain intensity
+        borderColor: Colors.indigo,
+        borderStrokeWidth: 2,
+      ),
+    ];
     return Scaffold(
       body: Column(
         children: [
@@ -49,11 +66,12 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return DropdownMenu(
-                  width: 500,
+                  // width: 500,
+                  expandedInsets: EdgeInsetsGeometry.all(8),
                   menuHeight: 200,
                   hintText: "Location",
                   dropdownMenuEntries: snapshot.data!,
-                  initialSelection: "Manila Observatory", // TODO: Fix this
+                  initialSelection: selectedLocation, // TODO: Fix this
                   onSelected: (location){
                     setState(() {
                       selectedLocation = location;
@@ -70,36 +88,66 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
             child: Stack(
               alignment: AlignmentDirectional.center,
                 children: [
-              FlutterMap(
-                mapController: _mapController,
-                options: MapOptions(
-                  initialCenter: LatLng(14.599512, 120.984222), // Initial map center (Philippines)
-                  minZoom: 0.0, // Initial zoom level
-                  onPositionChanged: (position, bounds) {
-                    // print('Position changed to ${position.center.latitude}, ${position.center.longitude}');
-                  },
-                ),
-                children: [
-                  TileLayer(
-                    // urlTemplate:
-                    //     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    // subdomains: const ['a', 'b', 'c'],
-                    urlTemplate:
-                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // TODO: take care of tile use policy
-                  ),
-                  // Custom Overlay for weather data (e.g., circles or custom markers for rain, wind speed, etc.)
-                  CircleLayer(
-                    circles: [
-                      CircleMarker(
-                        point: const LatLng(14.5995, 120.9842),
-                        color: Colors.blue.withOpacity(0.5),
-                        radius: 5, // Adjust radius based on rain intensity
-                        borderColor: Colors.blue,
-                        borderStrokeWidth: 2,
+              FutureBuilder(
+                future: weather.getLocationCoords(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return FlutterMap(
+                      mapController: _mapController,
+                      options: MapOptions(
+                        initialCenter: LatLng(14.599512, 120.984222), // Initial map center (Philippines)
+                        minZoom: 0.0, // Initial zoom level
+                        onPositionChanged: (position, bounds) {
+                          // print('Position changed to ${position.center.latitude}, ${position.center.longitude}');
+                        },
                       ),
-                    ],
+                      children: [
+                        TileLayer(
+                          // urlTemplate:
+                          //     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          // subdomains: const ['a', 'b', 'c'],
+                          urlTemplate:
+                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // TODO: take care of tile use policy
+                        ),
+                        // Custom Overlay for weather data (e.g., circles or custom markers for rain, wind speed, etc.)
+                        CircleLayer(
+                          circles: snapshot.data!
+                        ),
+                      ],
+                    );
+                  }
+                  return FlutterMap(
+                    mapController: _mapController,
+                    options: MapOptions(
+                      initialCenter: LatLng(14.599512, 120.984222), // Initial map center (Philippines)
+                      minZoom: 0.0, // Initial zoom level
+                      onPositionChanged: (position, bounds) {
+                        // print('Position changed to ${position.center.latitude}, ${position.center.longitude}');
+                      },
+                    ),
+                    children: [
+                      TileLayer(
+                        // urlTemplate:
+                        //     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        // subdomains: const ['a', 'b', 'c'],
+                        urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // TODO: take care of tile use policy
+                      ),
+                      // Custom Overlay for weather data (e.g., circles or custom markers for rain, wind speed, etc.)
+                      CircleLayer(
+                      circles: [
+                      CircleMarker(
+                      point: const LatLng(14.5995, 120.9842),
+                  color: Colors.blue.withAlpha(125),
+                  radius: 5, // Adjust radius based on rain intensity
+                  borderColor: Colors.indigo,
+                  borderStrokeWidth: 2,
                   ),
-                ],
+                  ],
+                  ),
+                    ],
+                  );
+                }
               ),
               Positioned.fill(
                   bottom: 8,

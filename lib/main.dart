@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
         selectedIndex: _currentIndex,
         onDestinationSelected: (int index) {
           setState(() {
-            _currentIndex = index.clamp(0, _children.length - 1);
+            _currentIndex = index;
           });
         },
         destinations: const [
