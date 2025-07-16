@@ -30,30 +30,30 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
       case "Rain":
         primaryObservation = "rain";
         primaryUnit = "mm";
-        secondaryText = "24hr total\n";
+        secondaryText = "24hr total";
         secondaryObservation = "rain_accum";
         secondaryUnit = primaryUnit;
         break;
       case "Temperature":
         primaryObservation = "temp";
         primaryUnit = "°C";
-        secondaryText = "Feels like\n";
+        secondaryText = "Feels like";
         secondaryObservation = "hi";
         secondaryUnit = "°C";
         break;
       case "Wind":
         primaryObservation = "wspd";
         primaryUnit = "m/s";
-        secondaryText = "Direction\n";
+        secondaryText = "Direction";
         secondaryObservation = "wdir";
         secondaryUnit = "";
         break;
       case "Pressure":
         primaryObservation = "mslp";
         primaryUnit = "hPa";
-        secondaryText = "\n";
+        secondaryText = "";
         secondaryObservation = "mslp";
-        secondaryUnit = "atm";
+        secondaryUnit = "hPa";
         break;
     }
 
@@ -80,123 +80,139 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                 ),
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              spacing: 8,
-              children: [
-                Flexible(
-                  child: Container(
-                    height: 80,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.horizontal(
-                          left: Radius.circular(32),
-                          right: Radius.circular(16)),
-                      color: Color.fromRGBO(238, 237, 244, 1.0),
-                    ),
-                    child: const Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                      child: Column(
+            FutureBuilder(
+                future: weather.getData(weather.selectedLocation),
+                builder: (context, snapshot) {
+                  Widget leftSection;
+                  Widget middleSection;
+                  Widget rightSection;
+                  if (snapshot.hasData) {
+                    leftSection = Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text("as of", textScaler: TextScaler.linear(0.8)),
-                          Text("30 Jun 2025",
+                          Text(snapshot.data!["date"],
                               textScaler: TextScaler.linear(0.8)),
-                          Text("10:00 AM", textScaler: TextScaler.linear(0.8)),
-                        ],
+                          Text(snapshot.data!["time"],
+                              textScaler: TextScaler.linear(0.8)),
+                        ]);
+                    middleSection = RichText(
+                        text: TextSpan(
+                            style: const TextStyle(
+                              color: Colors.black,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: snapshot.data![primaryObservation].toString(),
+                                style: TextStyle(fontSize: 36),
+                              ),
+                              WidgetSpan(
+                                  child: SizedBox(
+                                    width: 8,
+                                  )),
+                              TextSpan(
+                                text: primaryUnit,
+                                style: TextStyle(fontSize: 12),
+                              )
+                            ]));
+                    rightSection = Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(secondaryText, textScaler: TextScaler.linear(0.8)),
+                          Row(mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.baseline,
+                            textBaseline: TextBaseline.alphabetic,
+                            children: [
+                              Text(snapshot.data![secondaryObservation],
+                                  textScaler: TextScaler.linear(2)),
+                              Text(secondaryUnit,
+                                  textScaler: TextScaler.linear(0.8)),
+                            ],
+                          ),
+                        ]);
+                    // RichText(
+                    //     text: TextSpan(
+                    //         style: TextStyle(
+                    //           color: Colors.black,
+                    //         ),
+                    //         children: [
+                    //       TextSpan(
+                    //         text: secondaryText,
+                    //         style: TextStyle(fontSize: 12),
+                    //       ),
+                    //       TextSpan(
+                    //         children: [
+                    //           TextSpan(
+                    //             text: snapshot.data![secondaryObservation],
+                    //             style: TextStyle(fontSize: 24),
+                    //           ),
+                    //           TextSpan(
+                    //             text: secondaryUnit,
+                    //             style: TextStyle(fontSize: 12),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //     ]));
+                  } else {
+                    leftSection = CircularProgressIndicator();
+                    middleSection = CircularProgressIndicator();
+                    rightSection = CircularProgressIndicator();
+                  }
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 8,
+                    children: [
+                      Flexible(
+                        child: Container(
+                          height: 80,
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.horizontal(
+                                left: Radius.circular(32),
+                                right: Radius.circular(16)),
+                            color: Color.fromRGBO(238, 237, 244, 1.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 16),
+                            child: leftSection,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-                Flexible(
-                  child: Container(
-                    constraints: BoxConstraints(maxWidth: 200),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadiusGeometry.circular(16),
-                      color: const Color.fromRGBO(238, 237, 244, 1.0),
-                    ),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 16, horizontal: 16),
-                        child: FutureBuilder(
-                            future: weather.getData(weather.selectedLocation),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return RichText(
-                                    text: TextSpan(
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                        ),
-                                        children: [
-                                      TextSpan(
-                                        text: snapshot.data![primaryObservation]
-                                            .toString(),
-                                        style: TextStyle(fontSize: 36),
-                                      ),
-                                      WidgetSpan(
-                                          child: SizedBox(
-                                        width: 8,
-                                      )),
-                                      TextSpan(
-                                        text: primaryUnit,
-                                        style: TextStyle(fontSize: 12),
-                                      )
-                                    ]));
-                              }
-                              return const CircularProgressIndicator();
-                            }),
+                      Flexible(
+                        child: Container(
+                          constraints: BoxConstraints(maxWidth: 200),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadiusGeometry.circular(16),
+                            color: const Color.fromRGBO(238, 237, 244, 1.0),
+                          ),
+                          child: Center(
+                            child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 16, horizontal: 16),
+                                child: middleSection),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-                Flexible(
-                  child: Container(
-                    height: 80,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.horizontal(
-                        left: Radius.circular(16),
-                        right: Radius.circular(32),
+                      Flexible(
+                        child: Container(
+                          height: 88, // TODO: make adaptive
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.horizontal(
+                              left: Radius.circular(16),
+                              right: Radius.circular(32),
+                            ),
+                            color: Color.fromRGBO(238, 237, 244, 1.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 16),
+                            child: rightSection,
+                          ),
+                        ),
                       ),
-                      color: Color.fromRGBO(238, 237, 244, 1.0),
-                    ),
-                    child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                        child: FutureBuilder(
-                            future: weather.getData(weather.selectedLocation),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return RichText(
-                                    text: TextSpan(
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                        ),
-                                        children: [
-                                      TextSpan(
-                                        text: secondaryText,
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                      TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: snapshot.data![secondaryObservation],
-                                            style: TextStyle(fontSize: 24),
-                                          ),
-                                          TextSpan(
-                                            text: secondaryUnit,
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ],
-                                      ),
-                                    ]));
-                              }
-                              return const CircularProgressIndicator();
-                            })),
-                  ),
-                ),
-              ],
-            ),
+                    ],
+                  );
+                }),
             Container(
               padding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
               // height: 32,

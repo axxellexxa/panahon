@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:intl/intl.dart';
 
 class WeatherAPI {
   WeatherAPI();
@@ -43,7 +44,7 @@ class WeatherAPI {
   Future<Map<String, dynamic>> getData_(String location) async {
     return data.firstWhere((element) => element["name"] == location,
         orElse: () =>
-            {}); // TODO: make custom Map to include calculated wdirues
+            {});
   }
 
   Future<Map<String, dynamic>> getData(String location) async {
@@ -62,8 +63,10 @@ class WeatherAPI {
       "wspd": (source["obs"]["wspd"] as double).toStringAsFixed(2),
       "wdir": calcWindDirection(source["obs"]["wdir"]),
       "mslp": source["obs"]["mslp"].toString(),
+      "date": DateFormat("d MMM y").format(DateTime.parse(source["obs"]["timestamp"]).toLocal()),
+      "time": DateFormat("jm").format(DateTime.parse(source["obs"]["timestamp"]).toLocal()),
     };
-    return outputData; // TODO: make custom Map to include calculated wdirues
+    return outputData;
   }
 
   Future<List<DropdownMenuEntry>> getLocations() async {
