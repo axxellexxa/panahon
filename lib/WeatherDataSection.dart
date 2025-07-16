@@ -120,7 +120,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 16, horizontal: 16),
                         child: FutureBuilder(
-                            future: weather.getData2(weather.selectedLocation),
+                            future: weather.getData(weather.selectedLocation),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 return RichText(
@@ -164,7 +164,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                         padding:
                             EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                         child: FutureBuilder(
-                            future: weather.getData2(weather.selectedLocation),
+                            future: weather.getData(weather.selectedLocation),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 return RichText(

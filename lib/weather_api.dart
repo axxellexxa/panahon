@@ -40,13 +40,13 @@ class WeatherAPI {
         .toString();
   }
 
-  Future<Map<String, dynamic>> getData(String location) async {
+  Future<Map<String, dynamic>> getData_(String location) async {
     return data.firstWhere((element) => element["name"] == location,
         orElse: () =>
             {}); // TODO: make custom Map to include calculated wdirues
   }
 
-  Future<Map<String, dynamic>> getData2(String location) async {
+  Future<Map<String, dynamic>> getData(String location) async {
     Map source = data.firstWhere((element) => element["name"] == location,
         orElse: () => {});
     Map<String, dynamic> outputData = {
@@ -55,7 +55,7 @@ class WeatherAPI {
       "lat": source["lat"],
       "lon": source["lon"],
       "rain": source["obs"]["rain"],
-      "rain_accum": source["obs"]["rain_accum"].toString(),
+      "rain_accum": source["obs"]["rain_accum"].toStringAsFixed(2),
       "temp": source["obs"]["temp"],
       "hi": calcHeatIndex(source["obs"]["temp"], source["obs"]["rh"])
           .toStringAsFixed(1),
@@ -84,6 +84,7 @@ class WeatherAPI {
         borderStrokeWidth: 2,
         color: Colors.blue.withAlpha(125),
         borderColor: Colors.indigo,
+        hitValue: location["name"],
       );
       outputCircles.add(circle);
       // print(outputCircles);

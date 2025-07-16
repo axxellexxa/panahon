@@ -18,6 +18,8 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
   var weatherData;
   String selectedLocation = "Manila Observatory";
 
+  final LayerHitNotifier<Object> hitNotifier = ValueNotifier(null);
+
   @override
   void initState() {
     super.initState();
@@ -28,22 +30,6 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<CircleMarker> circles = [
-      CircleMarker(
-        point: const LatLng(14.5995, 120.9842),
-        color: Colors.blue.withAlpha(125),
-        radius: 5, // Adjust radius based on rain intensity
-        borderColor: Colors.indigo,
-        borderStrokeWidth: 2,
-      ),
-      CircleMarker(
-        point: const LatLng(14.635350998990003, 121.07793937540339),
-        color: Colors.blue.withAlpha(125),
-        radius: 5, // Adjust radius based on rain intensity
-        borderColor: Colors.indigo,
-        borderStrokeWidth: 2,
-      ),
-    ];
     return Scaffold(
       body: Column(
         children: [
@@ -110,8 +96,21 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                               'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // TODO: take care of tile use policy
                         ),
                         // Custom Overlay for weather data (e.g., circles or custom markers for rain, wind speed, etc.)
-                        CircleLayer(
-                          circles: snapshot.data!
+                        GestureDetector(
+                          onTap: () {
+                            final LayerHitResult<Object>? result = hitNotifier.value;
+                            if (result == null) return;
+                            print('Tapped on ${result.hitValues.first}');
+                            print('Living at ${result.coordinate}');
+                            setState(() {
+                              selectedLocation = result.hitValues.first.toString();
+                              weather.selectedLocation = selectedLocation;
+                            });
+                          },
+                          child: CircleLayer(
+                            hitNotifier: hitNotifier,
+                            circles: snapshot.data!
+                          ),
                         ),
                       ],
                     );
