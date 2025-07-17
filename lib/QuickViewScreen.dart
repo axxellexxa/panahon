@@ -101,7 +101,6 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                             final LayerHitResult<Object>? result = hitNotifier.value;
                             if (result == null) return;
                             print('Tapped on ${result.hitValues.first}');
-                            print('Living at ${result.coordinate}');
                             setState(() {
                               selectedLocation = result.hitValues.first.toString();
                               weather.selectedLocation = selectedLocation;

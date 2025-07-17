@@ -130,29 +130,6 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                             ],
                           ),
                         ]);
-                    // RichText(
-                    //     text: TextSpan(
-                    //         style: TextStyle(
-                    //           color: Colors.black,
-                    //         ),
-                    //         children: [
-                    //       TextSpan(
-                    //         text: secondaryText,
-                    //         style: TextStyle(fontSize: 12),
-                    //       ),
-                    //       TextSpan(
-                    //         children: [
-                    //           TextSpan(
-                    //             text: snapshot.data![secondaryObservation],
-                    //             style: TextStyle(fontSize: 24),
-                    //           ),
-                    //           TextSpan(
-                    //             text: secondaryUnit,
-                    //             style: TextStyle(fontSize: 12),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //     ]));
                   } else {
                     leftSection = CircularProgressIndicator();
                     middleSection = CircularProgressIndicator();

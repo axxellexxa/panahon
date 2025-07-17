@@ -21,7 +21,6 @@ class WeatherAPI {
       "Manila Observatory"; // TODO: should default to closest location
 
   List<dynamic> data = [];
-  List<CircleMarker> outputCircles = [];
 
   void initializeData() async {
     // Example HTTP request using http package
@@ -79,6 +78,7 @@ class WeatherAPI {
   }
 
   Future<List<CircleMarker>> getLocationCoords() async {
+    List<CircleMarker> outputCircles = [];
     for (var location in data) {
       LatLng coords = LatLng(location["lat"], location["lon"]);
       CircleMarker circle = CircleMarker(
@@ -90,7 +90,6 @@ class WeatherAPI {
         hitValue: location["name"],
       );
       outputCircles.add(circle);
-      // print(outputCircles);
     }
     return outputCircles;
   }
