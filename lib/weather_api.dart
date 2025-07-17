@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
@@ -57,6 +56,7 @@ class WeatherAPI {
   Future<Map<String, String>> getData(String location) async {
     Map source = data.firstWhere((element) => element["name"] == location,
         orElse: () => {});
+    // print("==i== Output data from $location: $source");
     Map<String, String> outputData = {
       "id": source["id"].toString(),
       "name": source["name"],
@@ -72,6 +72,7 @@ class WeatherAPI {
       "date": DateFormat("d MMM y").format(DateTime.parse(source["obs"]["timestamp"]).toLocal()),
       "time": DateFormat("jm").format(DateTime.parse(source["obs"]["timestamp"]).toLocal()),
     };
+    // print("==o== Output data from $location: $outputData");
     return outputData;
   }
 
@@ -79,7 +80,7 @@ class WeatherAPI {
     List<DropdownMenuEntry<String>> outputList = [];
     for (var location in data) {
       outputList.add(
-          DropdownMenuEntry(value: location["name"].toString(), label: location["name"]));
+          DropdownMenuEntry(value: location["name"], label: location["name"]));
     }
     return outputList;
   }

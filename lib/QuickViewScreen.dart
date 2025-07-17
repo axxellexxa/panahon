@@ -3,6 +3,7 @@ import 'weather_api.dart'; // Import your WeatherMapWidget.dart file
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'WeatherDataSection.dart';
+import 'package:collection/collection.dart';
 
 class QuickViewScreen extends StatefulWidget {
   const QuickViewScreen({super.key});
@@ -48,7 +49,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
               future: weather.getLocations(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return DropdownMenu(
+                return DropdownMenu(
                     selectedTrailingIcon: Icon(Icons.pin_drop),
                     // width: 500,
                     expandedInsets: EdgeInsetsGeometry.all(8),
@@ -56,7 +57,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                     hintText: "Location",
                     dropdownMenuEntries: snapshot.data!,
                     initialSelection:
-                        weather.selectedLocation, // TODO: Fix this
+                        snapshot.data!.firstWhereOrNull((element) => element.value == "Manila Observatory")?.value, // TODO: Default to closest station
                     onSelected: (location) {
                       setState(() {
                         weather.selectedLocation = location;
