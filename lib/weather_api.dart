@@ -24,7 +24,6 @@ class WeatherAPI {
 
   void initializeData() async {
     // Example HTTP request using http package
-    print("========== fetch data ==========");
     var response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
       data = jsonDecode(response.body);
@@ -46,33 +45,41 @@ class WeatherAPI {
             {});
   }
 
-  Future<Map<String, dynamic>> getData(String location) async {
+  // TODO: describe this function
+  String nullHelper(dynamic input, int digits) {
+    if (input.runtimeType == int || input.runtimeType == double) {
+      return (input as double).toStringAsFixed(digits);
+    } else {
+      return "n/a";
+    }
+  }
+
+  Future<Map<String, String>> getData(String location) async {
     Map source = data.firstWhere((element) => element["name"] == location,
         orElse: () => {});
-    Map<String, dynamic> outputData = {
-      "id": source["id"],
+    Map<String, String> outputData = {
+      "id": source["id"].toString(),
       "name": source["name"],
-      "lat": source["lat"],
-      "lon": source["lon"],
-      "rain": source["obs"]["rain"],
-      "rain_accum": source["obs"]["rain_accum"].toStringAsFixed(2),
-      "temp": source["obs"]["temp"],
-      "hi": calcHeatIndex(source["obs"]["temp"], source["obs"]["rh"])
-          .toStringAsFixed(1),
-      "wspd": (source["obs"]["wspd"] as double).toStringAsFixed(2),
+      "lat": source["lat"].toString(),
+      "lon": source["lon"].toString(),
+      "rain": nullHelper(source["obs"]["rain"], 2),
+      "rain_accum": nullHelper(source["obs"]["rain_accum"], 2),
+      "temp": nullHelper(source["obs"]["temp"], 1),
+      "hi": calcHeatIndex(source["obs"]["temp"], source["obs"]["rh"]),
+      "wspd": nullHelper(source["obs"]["wspd"], 2),
       "wdir": calcWindDirection(source["obs"]["wdir"]),
-      "mslp": source["obs"]["mslp"].toString(),
+      "mslp": nullHelper(source["obs"]["mslp"], 1),
       "date": DateFormat("d MMM y").format(DateTime.parse(source["obs"]["timestamp"]).toLocal()),
       "time": DateFormat("jm").format(DateTime.parse(source["obs"]["timestamp"]).toLocal()),
     };
     return outputData;
   }
 
-  Future<List<DropdownMenuEntry>> getLocations() async {
-    List<DropdownMenuEntry> outputList = [];
+  Future<List<DropdownMenuEntry<String>>> getLocations() async {
+    List<DropdownMenuEntry<String>> outputList = [];
     for (var location in data) {
       outputList.add(
-          DropdownMenuEntry(value: location["name"], label: location["name"]));
+          DropdownMenuEntry(value: location["name"].toString(), label: location["name"]));
     }
     return outputList;
   }
@@ -94,17 +101,20 @@ class WeatherAPI {
     return outputCircles;
   }
 
-  double calcHeatIndex(double temp, double rh) {
+  String calcHeatIndex(dynamic temp, dynamic rh) {
+    if (temp == null || rh == null) {
+      return "n/a";
+    }
     // source: https://github.com/mcci-catena/heat-index/blob/master/heat-index.js
     double tf = (temp * 9.0) / 5.0 + 32.0;
     double tfRounded = (tf + 0.5).floorToDouble();
 
     // return null outside the specified range of input parameters
     if (tfRounded < 76 || tfRounded > 126) {
-      return -0.0;
+      return "n/a";
     }
     if (rh < 0 || rh > 100) {
-      return -0.0;
+      return "n/a";
     }
 
     // according to the NWS, we try this first, and use it if we can
@@ -114,7 +124,7 @@ class WeatherAPI {
     // This is the same computation:
     if (hiEasyF + tf < 160.0) {
       double hiEasy = ((hiEasyF - 32.0) * 5.0) / 9.0;
-      return ((hiEasy * 10).roundToDouble() / 10);
+      return ((hiEasy * 10).roundToDouble() / 10).toStringAsFixed(1);
     }
 
     // need to use the hard form, and possibly adjust.
@@ -147,16 +157,16 @@ class WeatherAPI {
     // finally, the reference tables have no data above 183 (rounded),
     // so filter out answers that we have no way to vouch for.
     if (hiF >= 183.5) {
-      return -0.0;
+      return "n/a";
     } else {
       double hiC = ((hiF - 32.0) * 5.0) / 9.0;
-      return (hiC * 10).roundToDouble() / 10;
+      return ((hiC * 10).roundToDouble() / 10).toStringAsFixed(1);
     }
   }
 
-  String calcWindDirection(int wdir) {
-    if (!(wdir >= 0 && wdir <= 360)) {
-      return '';
+  String calcWindDirection(dynamic wdir) {
+    if (wdir.runtimeType != double && wdir.runtimeType != int) { // TODO: consider erroneous values (e.g. < 0 || > 360)
+      return 'n/a';
     }
     if (wdir <= 22.5) {
       return 'N';
@@ -191,5 +201,6 @@ class WeatherAPI {
     } else {
       return 'NNW';
     }
+
   }
 }

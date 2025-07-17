@@ -91,9 +91,9 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text("as of", textScaler: TextScaler.linear(0.8)),
-                          Text(snapshot.data!["date"],
+                          Text(snapshot.data!["date"]!,
                               textScaler: TextScaler.linear(0.8)),
-                          Text(snapshot.data!["time"],
+                          Text(snapshot.data!["time"]!,
                               textScaler: TextScaler.linear(0.8)),
                         ]);
                     middleSection = RichText(
@@ -103,7 +103,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                             ),
                             children: [
                               TextSpan(
-                                text: snapshot.data![primaryObservation].toString(),
+                                text: snapshot.data![primaryObservation],
                                 style: TextStyle(fontSize: 36),
                               ),
                               WidgetSpan(
@@ -123,7 +123,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                             crossAxisAlignment: CrossAxisAlignment.baseline,
                             textBaseline: TextBaseline.alphabetic,
                             children: [
-                              Text(snapshot.data![secondaryObservation],
+                              Text(snapshot.data![secondaryObservation]!,
                                   textScaler: TextScaler.linear(2)),
                               Text(secondaryUnit,
                                   textScaler: TextScaler.linear(0.8)),
