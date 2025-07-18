@@ -52,8 +52,8 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
           //     );
           //   }
           // ),
-          FutureBuilder<List<DropdownMenuEntry>>(
-              future: weather.getLocations(),
+          FutureBuilder(
+              future: weather.getLocations2(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return DropdownMenu(
@@ -63,14 +63,15 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                     expandedInsets: EdgeInsetsGeometry.all(8),
                     menuHeight: 200,
                     hintText: "Location",
-                    dropdownMenuEntries: snapshot.data!,
-                    initialSelection: snapshot.data!
+                    dropdownMenuEntries: snapshot.data![0] as List<DropdownMenuEntry<String>>,
+                    initialSelection: (snapshot.data![0] as List)
                         .firstWhereOrNull(
                             (element) => element.value == "Manila Observatory")
                         ?.value, // TODO: Default to closest station
                     onSelected: (location) {
+                      _mapController.move(snapshot.data![1][location], _mapController.camera.zoom);
                       setState(() {
-                        weather.selectedLocation = location;
+                        weather.selectedLocation = location.toString(); // TODO: Check if this updates the info section
                       });
                     },
                   );
@@ -88,11 +89,15 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                       return FlutterMap(
                         mapController: _mapController,
                         options: MapOptions(
+                          onMapReady: () {
+                            _mapController.mapEventStream.listen((evt) {});
+                          },
                           initialCenter: LatLng(14.599512,
                               120.984222), // Initial map center (Philippines)
                           minZoom: 0.0, // Initial zoom level
                           onPositionChanged: (position, bounds) {
                             // print('Position changed to ${position.center.latitude}, ${position.center.longitude}');
+
                           },
                         ),
                         children: [

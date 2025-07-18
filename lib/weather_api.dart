@@ -98,8 +98,18 @@ class WeatherAPI {
     }
     return outputList;
   }
+  Future<List<dynamic>> getLocations2() async { // TODO: rename function
+    List<DropdownMenuEntry<String>> entries = [];
+    Map<String, LatLng> coords = {};
+    for (var location in data) {
+      entries.add(
+          DropdownMenuEntry(value: location["name"], label: location["name"]));
+      coords[location["name"]] = LatLng(location["lat"], location["lon"]);
+    }
+    return [entries, coords];
+  }
 
-  Future<List<CircleMarker>> getLocationCoords() async {
+  Future<List<CircleMarker>> getLocationCoords() async { // TODO: rename function
     List<CircleMarker> outputCircles = [];
     for (var location in data) {
       LatLng coords = LatLng(location["lat"], location["lon"]);
