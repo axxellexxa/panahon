@@ -47,7 +47,7 @@ class WeatherAPI {
   // TODO: describe this function
   String nullHelper(dynamic input, int digits) {
     if (input.runtimeType == int || input.runtimeType == double) {
-      return (input as double).toStringAsFixed(digits);
+      return input.toStringAsFixed(digits);
     } else {
       return "n/a";
     }
@@ -57,6 +57,20 @@ class WeatherAPI {
     Map source = data.firstWhere((element) => element["name"] == location,
         orElse: () => {});
     // print("==i== Output data from $location: $source");
+    //   print("data start ==================");
+    //   print("==0== ${nullHelper(source["obs"]["rain"], 2)}");
+    //   print("==1== ${source["obs"]["rain"]}");
+    //   print("==2== ${source["lat"].toString()}");
+    //   print("==3== ${source["lon"].toString()}");
+    //   print("==4== ${nullHelper(source["obs"]["rain"], 2)}");
+    //   print("==5== ${nullHelper(source["obs"]["rain_accum"], 2)}");
+    //   print("==6== ${nullHelper(source["obs"]["temp"], 1)}");
+    //   print("==7== ${calcHeatIndex(source["obs"]["temp"], source["obs"]["rh"])}");
+    //   print("==8== ${nullHelper(source["obs"]["wspd"], 2)}");
+    //   print("==9== ${calcWindDirection(source["obs"]["wdir"])}");
+    //   print("==A== ${nullHelper(source["obs"]["mslp"], 1)}");
+    //   print("==B== ${DateFormat("d MMM y").format(DateTime.parse(source["obs"]["timestamp"]).toLocal())}");
+    //   print("==C== ${DateFormat("jm").format(DateTime.parse(source["obs"]["timestamp"]).toLocal())}");
     Map<String, String> outputData = {
       "id": source["id"].toString(),
       "name": source["name"],
@@ -130,7 +144,7 @@ class WeatherAPI {
 
     // need to use the hard form, and possibly adjust.
     double tf2 = tf * tf;
-    double rh2 = rh * rh;
+    double rh2 = pow(rh, 2).toDouble();
     double hiF = -42.379 +
         2.04901523 * tf +
         10.14333127 * rh -

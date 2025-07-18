@@ -50,7 +50,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                 return DropdownMenu(
-                    selectedTrailingIcon: Icon(Icons.pin_drop),
+                    leadingIcon: Icon(Icons.pin_drop),
                     // width: 500,
                     expandedInsets: EdgeInsetsGeometry.all(8),
                     menuHeight: 200,

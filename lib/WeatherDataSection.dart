@@ -25,7 +25,6 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
 
   @override
   Widget build(BuildContext context) {
-    // weather.initializeData();
     switch (weatherDataView) {
       case "Rain":
         primaryObservation = "rain";
