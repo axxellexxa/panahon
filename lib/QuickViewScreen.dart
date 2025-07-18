@@ -14,6 +14,7 @@ class QuickViewScreen extends StatefulWidget {
 
 class _QuickViewScreenState extends State<QuickViewScreen> {
   final MapController _mapController = MapController();
+  final TextEditingController locationController = TextEditingController();
 
   var weather = WeatherAPI();
   var weatherData;
@@ -24,6 +25,12 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
   void initState() {
     super.initState();
     weather.initializeData();
+  }
+
+  @override
+  void dispose() {
+    locationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -49,15 +56,18 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
               future: weather.getLocations(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                return DropdownMenu(
+                  return DropdownMenu(
+                    controller: locationController,
                     leadingIcon: Icon(Icons.pin_drop),
                     // width: 500,
                     expandedInsets: EdgeInsetsGeometry.all(8),
                     menuHeight: 200,
                     hintText: "Location",
                     dropdownMenuEntries: snapshot.data!,
-                    initialSelection:
-                        snapshot.data!.firstWhereOrNull((element) => element.value == "Manila Observatory")?.value, // TODO: Default to closest station
+                    initialSelection: snapshot.data!
+                        .firstWhereOrNull(
+                            (element) => element.value == "Manila Observatory")
+                        ?.value, // TODO: Default to closest station
                     onSelected: (location) {
                       setState(() {
                         weather.selectedLocation = location;
@@ -96,6 +106,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                             onTap: () {
                               final LayerHitResult<Object>? result =
                                   hitNotifier.value;
+                              locationController.text = result!.hitValues.first.toString();
                               if (result == null) return;
                               // print('Tapped on ${result.hitValues.first}');
                               setState(() {
@@ -133,7 +144,8 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                             CircleMarker(
                               point: const LatLng(14.5995, 120.9842),
                               color: Colors.blue.withAlpha(125),
-                              radius: 5, // Adjust radius based on rain intensity
+                              radius:
+                                  5, // Adjust radius based on rain intensity
                               borderColor: Colors.indigo,
                               borderStrokeWidth: 2,
                             ),
@@ -143,8 +155,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                     );
                   }),
               Positioned.fill(
-                  bottom: 8, child: WeatherDataSection(weatherAPI: weather)
-              ),
+                  bottom: 8, child: WeatherDataSection(weatherAPI: weather)),
             ]),
           ),
         ],
