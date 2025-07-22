@@ -18,6 +18,9 @@ class WeatherAPI {
       'https://panahon.observatory.ph/data/api/v1/observations/latest';
   String selectedLocation =
       "Manila Observatory"; // TODO: should default to closest location
+  String selectedData = "Temperature";
+  ValueNotifier<String> selectedDataL = ValueNotifier<String>("Temperature");
+  // MapController mapController = MapController();
 
   List<dynamic> data = [];
 
@@ -104,26 +107,104 @@ class WeatherAPI {
     for (var location in data) {
       entries.add(
           DropdownMenuEntry(value: location["name"], label: location["name"]));
-      coords[location["name"]] = LatLng(location["lat"], location["lon"]);
+      coords[location["name"]] = LatLng(location["lat"] ?? 0, location["lon"] ?? 0);
     }
     return [entries, coords];
   }
 
   Future<List<CircleMarker>> getLocationCoords() async { // TODO: rename function
     List<CircleMarker> outputCircles = [];
+    // print(data);
     for (var location in data) {
-      LatLng coords = LatLng(location["lat"], location["lon"]);
-      CircleMarker circle = CircleMarker(
-        point: coords,
-        radius: 5,
-        borderStrokeWidth: 2,
-        color: Colors.blue.withAlpha(125),
-        borderColor: Colors.indigo,
-        hitValue: location["name"],
-      );
+      try {
+        LatLng coords = LatLng(location["lat"] ?? 0, location["lon"] ?? 0);
+        CircleMarker circle = CircleMarker(
+          point: coords,
+          radius: 5,
+          borderStrokeWidth: 5,
+          color: Color.lerp(Color.fromRGBO(0xde, 0xeb, 0xf7, 1), Color.fromRGBO(0x08, 0x50, 0x9b, 1), ((location["obs"]["temp"] ?? 0) - 25)/10)!,
+          borderColor: Colors.indigo,
+          hitValue: location["name"],
+        );
       outputCircles.add(circle);
+      } catch (e) {
+        print("something bad happened with ${location["id"]} : $e");
+      }
     }
     return outputCircles;
+  }
+  Future<List<List<CircleMarker>>> getLocationCoords2() async { // TODO: rename function
+    List<List<CircleMarker>> output = [];
+    List types = ["Rain", "Temperature", "Wind", "Pressure"];
+    String obs = "";
+    Color borderColor = Colors.black;
+    Color startColor = Colors.white70;
+    Color endColor = Colors.white10;
+    double minimum = 0;
+    double diff = 0;
+    for (var t in types) {
+      switch (t) {
+        case "Rain":
+          obs = "rain";
+          borderColor = Colors.blue;
+          startColor = Color.fromRGBO(0xde, 0xeb, 0xf7, 1);
+          endColor = Color.fromRGBO(0x08, 0x50, 0x9b, 1);
+          minimum = 0;
+          diff = 25;
+          break;
+        case "Temperature":
+          obs = "temp";
+          borderColor = Colors.red;
+          startColor = Color.fromRGBO(0xfe, 0xe0, 0xd2, 1);
+          endColor = Color.fromRGBO(0xa3, 0x0f, 0x15, 1);
+          minimum = 25;
+          diff = 10;
+          break;
+        case "Wind":
+          obs = "wspd";
+          borderColor = Colors.green;
+          startColor = Colors.green.shade200;
+          endColor = Colors.green.shade900;
+          minimum = 0;
+          diff = 10;
+          break;
+        case "Pressure":
+          obs = "mslp";
+          borderColor = Colors.orange;
+          startColor = Colors.orange.shade200;
+          endColor = Colors.orange.shade900;
+          minimum = 1000;
+          diff = 200;
+          break;
+      }
+      List<CircleMarker> outputCircles = [];
+      for (var location in data) {
+        try {
+          LatLng coords = LatLng(location["lat"] ?? 0, location["lon"] ?? 0);
+          CircleMarker circle = CircleMarker(
+            point: coords,
+            radius: 5,
+            borderStrokeWidth: 5,
+            color: colorHandler(location["obs"][obs], startColor, endColor, minimum, diff),
+            borderColor: borderColor,
+            hitValue: location["name"],
+          );
+        outputCircles.add(circle);
+        } catch (e) {
+          print("something bad happened with ${location["id"]} : $e");
+        }
+      }
+      output.add(outputCircles);
+    }
+    return output;
+  }
+
+  // if value is null, set to black. otherwise, use gradient. TODO: account for values lower than minimum, and higher than maximum
+  Color colorHandler(dynamic value, Color start, Color end, double minimum, double diff) {
+    if (value != null) {
+      return Color.lerp(start, end, (value - minimum)/diff)!;
+    }
+    return Colors.black.withAlpha(255);
   }
 
   String calcHeatIndex(dynamic temp, dynamic rh) {

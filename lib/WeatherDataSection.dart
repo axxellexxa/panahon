@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:panahon/weather_api.dart';
 
 class WeatherDataSection extends StatefulWidget {
@@ -25,7 +26,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
 
   @override
   Widget build(BuildContext context) {
-    switch (weatherDataView) {
+    switch (weather.selectedDataL.value) {
       case "Rain":
         primaryObservation = "rain";
         primaryUnit = "mm";
@@ -224,12 +225,11 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                     icon: const Icon(Icons.speed),
                   ),
                 ],
-                selected: <String>{weatherDataView},
+                selected: <String>{weather.selectedDataL.value},
                 onSelectionChanged: (Set<String> newSelection) {
                   setState(() {
-                    // By default there is only a single segment that can be
-                    // selected at one time, so its value is always the first
-                    // item in the selected set.
+                    // weather.selectedData = newSelection.first;
+                    weather.selectedDataL.value = newSelection.first;
                     weatherDataView = newSelection.first;
                   });
                 },

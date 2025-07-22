@@ -14,7 +14,7 @@ class QuickViewScreen extends StatefulWidget {
 
 class _QuickViewScreenState extends State<QuickViewScreen> {
   final MapController _mapController = MapController();
-  final TextEditingController locationController = TextEditingController();
+  final TextEditingController locationTextController = TextEditingController();
 
   var weather = WeatherAPI();
   var weatherData;
@@ -29,7 +29,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
 
   @override
   void dispose() {
-    locationController.dispose();
+    locationTextController.dispose();
     super.dispose();
   }
 
@@ -57,7 +57,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return DropdownMenu(
-                    controller: locationController,
+                    controller: locationTextController,
                     leadingIcon: Icon(Icons.pin_drop),
                     // width: 500,
                     expandedInsets: EdgeInsetsGeometry.all(8),
@@ -69,7 +69,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                             (element) => element.value == "Manila Observatory")
                         ?.value, // TODO: Default to closest station
                     onSelected: (location) {
-                      _mapController.move(snapshot.data![1][location], _mapController.camera.zoom);
+                      _mapController.move(snapshot.data![1][location], 11);
                       setState(() {
                         weather.selectedLocation = location.toString(); // TODO: Check if this updates the info section
                       });
@@ -82,83 +82,73 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
               }),
           Expanded(
             child: Stack(alignment: AlignmentDirectional.center, children: [
-              FutureBuilder(
-                  future: weather.getLocationCoords(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return FlutterMap(
-                        mapController: _mapController,
-                        options: MapOptions(
-                          onMapReady: () {
-                            _mapController.mapEventStream.listen((evt) {});
-                          },
-                          initialCenter: LatLng(14.599512,
-                              120.984222), // Initial map center (Philippines)
-                          minZoom: 0.0, // Initial zoom level
-                          onPositionChanged: (position, bounds) {
-                            // print('Position changed to ${position.center.latitude}, ${position.center.longitude}');
+              ValueListenableBuilder(
+                valueListenable: weather.selectedDataL,
+                builder: (context, value, child) {
+                  return FutureBuilder(
+                      future: weather.getLocationCoords2(),
+                      builder: (context, snapshot) {
+                        int selectedCircleIndex = 1;
+                        switch (weather.selectedDataL.value) {
+                          case "Rain":
+                            selectedCircleIndex = 0;
+                            break;
+                          case "Temperature":
+                            selectedCircleIndex = 1;
+                            break;
+                          case "Wind":
+                            selectedCircleIndex = 2;
+                            break;
+                          case "Pressure":
+                            selectedCircleIndex = 3;
+                            break;
+                        }
+                        if (snapshot.hasData) {
+                          return FlutterMap(
+                            mapController: _mapController,
+                            options: MapOptions(
+                              onMapReady: () {
+                                _mapController.mapEventStream.listen((evt) {});
+                              },
+                              initialCenter: LatLng(14.599512,
+                                  120.984222), // Initial map center (Philippines)
+                              minZoom: 0.0, // Initial zoom level
+                              onPositionChanged: (position, bounds) {
+                                // print('Position changed to ${position.center.latitude}, ${position.center.longitude}');
 
-                          },
-                        ),
-                        children: [
-                          TileLayer(
-                            userAgentPackageName: "com.example.panahon",
-                            urlTemplate:
-                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // TODO: take care of tile use policy
-                          ),
-                          // Custom Overlay for weather data (e.g., circles or custom markers for rain, wind speed, etc.)
-                          GestureDetector(
-                            onTap: () {
-                              final LayerHitResult<Object>? result =
-                                  hitNotifier.value;
-                              locationController.text = result!.hitValues.first.toString();
-                              if (result == null) return;
-                              // print('Tapped on ${result.hitValues.first}');
-                              setState(() {
-                                weather.selectedLocation =
-                                    result.hitValues.first.toString();
-                              });
-                            },
-                            child: CircleLayer(
-                                hitNotifier: hitNotifier,
-                                circles: snapshot.data!),
-                          ),
-                        ],
-                      );
-                    }
-                    return FlutterMap(
-                      mapController: _mapController,
-                      options: MapOptions(
-                        initialCenter: LatLng(14.599512,
-                            120.984222), // Initial map center (Philippines)
-                        minZoom: 0.0, // Initial zoom level
-                        onPositionChanged: (position, bounds) {
-                          // print('Position changed to ${position.center.latitude}, ${position.center.longitude}');
-                        },
-                      ),
-                      children: [
-                        TileLayer(
-                          userAgentPackageName: "com.example.panahon",
-                          urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // TODO: take care of tile use policy
-                          // 'https://api.mapbox.com/styles/v1/rcandari/cmd6y916r03bp01r54nqogxg9/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmNhbmRhcmkiLCJhIjoiY21jYTYwMGdqMDAxYTJtcG9waTIyb2dnZiJ9.frUb6ustrXPs2zPS6m6VzQ', // TODO: take care of tile use policy
-                        ),
-                        // Custom Overlay for weather data (e.g., circles or custom markers for rain, wind speed, etc.)
-                        CircleLayer(
-                          circles: [
-                            CircleMarker(
-                              point: const LatLng(14.5995, 120.9842),
-                              color: Colors.blue.withAlpha(125),
-                              radius:
-                                  5, // Adjust radius based on rain intensity
-                              borderColor: Colors.indigo,
-                              borderStrokeWidth: 2,
+                              },
                             ),
-                          ],
-                        ),
-                      ],
-                    );
-                  }),
+                            children: [
+                              TileLayer(
+                                userAgentPackageName: "com.example.panahon",
+                                urlTemplate:
+                                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // TODO: take care of tile use policy
+                              ),
+                              // Custom Overlay for weather data (e.g., circles or custom markers for rain, wind speed, etc.)
+                              GestureDetector(
+                                onTap: () {
+                                  final LayerHitResult<Object>? result =
+                                      hitNotifier.value;
+                                  locationTextController.text = result!.hitValues.first.toString();
+                                  if (result == null) return;
+                                  // print('Tapped on ${result.hitValues.first}');
+                                  setState(() {
+                                    weather.selectedLocation =
+                                        result.hitValues.first.toString();
+                                  });
+                                },
+                                child: CircleLayer(
+                                    hitNotifier: hitNotifier,
+                                    circles: snapshot.data![selectedCircleIndex]),
+                              ),
+                            ],
+                          );
+                        }
+                        print("===== MAP IS NOT WORKING =====");
+                        return Center(child: CircularProgressIndicator(),);
+                      });
+                }
+              ),
               Positioned.fill(
                   bottom: 8, child: WeatherDataSection(weatherAPI: weather)),
             ]),
