@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'WeatherDataSection.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter_map_animations/flutter_map_animations.dart';
 
 class QuickViewScreen extends StatefulWidget {
   const QuickViewScreen({super.key});
@@ -12,8 +13,13 @@ class QuickViewScreen extends StatefulWidget {
   _QuickViewScreenState createState() => _QuickViewScreenState();
 }
 
-class _QuickViewScreenState extends State<QuickViewScreen> {
-  final MapController _mapController = MapController();
+class _QuickViewScreenState extends State<QuickViewScreen> with TickerProviderStateMixin {
+  late final AnimatedMapController _mapController = AnimatedMapController(
+    vsync: this,
+    duration: const Duration(milliseconds: 500),
+    curve: Curves.easeInOut,
+    cancelPreviousAnimations: true, // Default to false
+  );
   final TextEditingController locationTextController = TextEditingController();
 
   var weather = WeatherAPI();
@@ -69,7 +75,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                             (element) => element.value == "Manila Observatory")
                         ?.value, // TODO: Default to closest station
                     onSelected: (location) {
-                      _mapController.move(snapshot.data![1][location], 11);
+                      _mapController.animateTo(dest: snapshot.data![1][location], zoom: 12);
                       setState(() {
                         weather.selectedLocation = location.toString(); // TODO: Check if this updates the info section
                       });
@@ -105,10 +111,10 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                         }
                         if (snapshot.hasData) {
                           return FlutterMap(
-                            mapController: _mapController,
+                            mapController: _mapController.mapController,
                             options: MapOptions(
                               onMapReady: () {
-                                _mapController.mapEventStream.listen((evt) {});
+                                _mapController.mapController.mapEventStream.listen((evt) {});
                               },
                               initialCenter: LatLng(14.599512,
                                   120.984222), // Initial map center (Philippines)
@@ -136,6 +142,27 @@ class _QuickViewScreenState extends State<QuickViewScreen> {
                                     weather.selectedLocation =
                                         result.hitValues.first.toString();
                                   });
+                                  _mapController.animateTo(
+                                      dest: LatLng(
+                                          weather.data.firstWhereOrNull((element) => element["name"] == result.hitValues.first.toString())["lat"],
+                                          weather.data.firstWhereOrNull((element) => element["name"] == result.hitValues.first.toString())["lon"]),
+                                      zoom: _mapController.mapController.camera.zoom);
+                                },
+                                onDoubleTap: () {
+                                  final LayerHitResult<Object>? result =
+                                      hitNotifier.value;
+                                  locationTextController.text = result!.hitValues.first.toString();
+                                  if (result == null) return;
+                                  // print('Tapped on ${result.hitValues.first}');
+                                  setState(() {
+                                    weather.selectedLocation =
+                                        result.hitValues.first.toString();
+                                  });
+                                  _mapController.animateTo(
+                                      dest: LatLng(
+                                          weather.data.firstWhereOrNull((element) => element["name"] == result.hitValues.first.toString())["lat"],
+                                          weather.data.firstWhereOrNull((element) => element["name"] == result.hitValues.first.toString())["lon"]),
+                                      zoom: 12);
                                 },
                                 child: CircleLayer(
                                     hitNotifier: hitNotifier,
