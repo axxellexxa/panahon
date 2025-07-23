@@ -180,13 +180,14 @@ class WeatherAPI {
       List<CircleMarker> outputCircles = [];
       for (var location in data) {
         try {
+          bool isObsNull = (location["obs"][obs] == null);
           LatLng coords = LatLng(location["lat"] ?? 0, location["lon"] ?? 0);
           CircleMarker circle = CircleMarker(
             point: coords,
             radius: 5,
-            borderStrokeWidth: 5,
+            borderStrokeWidth: isObsNull ? 2 : 5,
             color: colorHandler(location["obs"][obs], startColor, endColor, minimum, diff),
-            borderColor: borderColor,
+            borderColor: isObsNull ? Colors.black : borderColor,
             hitValue: location["name"],
           );
         outputCircles.add(circle);
@@ -202,9 +203,15 @@ class WeatherAPI {
   // if value is null, set to black. otherwise, use gradient. TODO: account for values lower than minimum, and higher than maximum
   Color colorHandler(dynamic value, Color start, Color end, double minimum, double diff) {
     if (value != null) {
-      return Color.lerp(start, end, (value - minimum)/diff)!;
+      num t = value;
+      if (value > minimum + diff) {
+        t = minimum + diff;
+      } else if (value < minimum) {
+        t = minimum;
+      }
+      return Color.lerp(start, end, (t - minimum)/diff)!;
     }
-    return Colors.black.withAlpha(255);
+    return Colors.black.withAlpha(0);
   }
 
   String calcHeatIndex(dynamic temp, dynamic rh) {
