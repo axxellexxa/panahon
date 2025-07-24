@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'weather_api.dart'; // Import your WeatherMapWidget.dart file
-import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map/flutter_map.dart' hide AttributionAlignment;
 import 'package:latlong2/latlong.dart';
 import 'WeatherDataSection.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:panahon/CustomAttribution.dart';
 
 class QuickViewScreen extends StatefulWidget {
   const QuickViewScreen({super.key});
@@ -168,6 +170,30 @@ class _QuickViewScreenState extends State<QuickViewScreen> with TickerProviderSt
                                     hitNotifier: hitNotifier,
                                     circles: snapshot.data![selectedCircleIndex]),
                               ),
+                              // RichAttributionWidget(
+                              //   popupInitialDisplayDuration: Duration(seconds: 5),
+                              //   attributions: [
+                              //     // Suggested attribution for the OpenStreetMap public tile server
+                              //     TextSourceAttribution(
+                              //       'OpenStreetMap contributors',
+                              //       onTap: () => launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
+                              //     ),
+                              //   ],
+                              // ),
+                              CustomAttributionWidget(
+                                popupInitialDisplayDuration: Duration(seconds: 5),
+                                alignment: AttributionAlignment.topRight,
+                                attributions: [
+                                // Suggested attribution for the OpenStreetMap public tile server
+                                TextSourceAttribution(
+                                  'OpenStreetMap contributors',
+                                  onTap: () => launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
+                                ),
+                                TextSourceAttribution(
+                                  "DISCLAIMER: This website contains experimental forecasts for research purposes. For official updates and warnings, please refer to PAGASA and other government agencies. ",
+                                  prependCopyright: false,
+                                )
+                              ],)
                             ],
                           );
                         }
