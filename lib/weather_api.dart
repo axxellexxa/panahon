@@ -59,31 +59,16 @@ class WeatherAPI {
   Future<Map<String, String>> getData(String location) async {
     Map source = data.firstWhere((element) => element["name"] == location,
         orElse: () => {});
-    // print("==i== Output data from $location: $source");
-    //   print("data start ==================");
-    //   print("==0== ${nullHelper(source["obs"]["rain"], 2)}");
-    //   print("==1== ${source["obs"]["rain"]}");
-    //   print("==2== ${source["lat"].toString()}");
-    //   print("==3== ${source["lon"].toString()}");
-    //   print("==4== ${nullHelper(source["obs"]["rain"], 2)}");
-    //   print("==5== ${nullHelper(source["obs"]["rain_accum"], 2)}");
-    //   print("==6== ${nullHelper(source["obs"]["temp"], 1)}");
-    //   print("==7== ${calcHeatIndex(source["obs"]["temp"], source["obs"]["rh"])}");
-    //   print("==8== ${nullHelper(source["obs"]["wspd"], 2)}");
-    //   print("==9== ${calcWindDirection(source["obs"]["wdir"])}");
-    //   print("==A== ${nullHelper(source["obs"]["mslp"], 1)}");
-    //   print("==B== ${DateFormat("d MMM y").format(DateTime.parse(source["obs"]["timestamp"]).toLocal())}");
-    //   print("==C== ${DateFormat("jm").format(DateTime.parse(source["obs"]["timestamp"]).toLocal())}");
     Map<String, String> outputData = {
       "id": source["id"].toString(),
       "name": source["name"],
       "lat": source["lat"].toString(),
       "lon": source["lon"].toString(),
-      "rain": nullHelper(source["obs"]["rain"], 2),
-      "rain_accum": nullHelper(source["obs"]["rain_accum"], 2),
+      "rain": nullHelper(source["obs"]["rain"], 1),
+      "rain_accum": nullHelper(source["obs"]["rain_accum"], 1),
       "temp": nullHelper(source["obs"]["temp"], 1),
       "hi": calcHeatIndex(source["obs"]["temp"], source["obs"]["rh"]),
-      "wspd": nullHelper(source["obs"]["wspd"], 2),
+      "wspd": nullHelper(source["obs"]["wspd"], 1),
       "wdir": calcWindDirection(source["obs"]["wdir"]),
       "mslp": nullHelper(source["obs"]["mslp"], 1),
       "date": DateFormat("d MMM y").format(DateTime.parse(source["obs"]["timestamp"]).toLocal()),
