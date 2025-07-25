@@ -67,10 +67,11 @@ class _QuickViewScreenState extends State<QuickViewScreen> with TickerProviderSt
                   return DropdownMenu(
                     controller: locationTextController,
                     leadingIcon: Icon(Icons.pin_drop),
-                    // width: 500,
                     expandedInsets: EdgeInsetsGeometry.all(8),
                     menuHeight: 200,
                     hintText: "Location",
+                    enableSearch: true,
+                    requestFocusOnTap: true,
                     dropdownMenuEntries: snapshot.data![0] as List<DropdownMenuEntry<String>>,
                     initialSelection: (snapshot.data![0] as List)
                         .firstWhereOrNull(
@@ -81,6 +82,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> with TickerProviderSt
                       setState(() {
                         weather.selectedLocation = location.toString(); // TODO: Check if this updates the info section
                       });
+                      FocusManager.instance.primaryFocus?.unfocus();
                     },
                   );
                 } else if (snapshot.hasError) {
