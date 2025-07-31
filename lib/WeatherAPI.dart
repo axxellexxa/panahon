@@ -13,17 +13,15 @@ class WeatherAPI {
   double rain = 0.0;
   double windSpeed = 0.0;
   double pressure = 0.0;
-  // String apiKey = '82febee1d40b64392c1d7d487e63b875';
   String apiUrl =
       'https://panahon.observatory.ph/data/api/v1/observations/latest';
   String selectedLocation =
       "Manila Observatory"; // TODO: should default to closest location
-  String selectedData = "Temperature";
-  ValueNotifier<String> selectedDataL = ValueNotifier<String>("Temperature");
-  // MapController mapController = MapController();
+  ValueNotifier<String> selectedData = ValueNotifier<String>("Temperature");
 
   List<dynamic> data = [];
 
+  /// Fetches data from the API
   void initializeData() async {
     // Example HTTP request using http package
     var response = await http.get(Uri.parse(apiUrl));
@@ -34,20 +32,7 @@ class WeatherAPI {
     }
   }
 
-  Future<String> getDataField(String location, String field) async {
-    return data
-        .firstWhere((element) => element["name"] == location,
-            orElse: () => {field: null})[field]
-        .toString();
-  }
-
-  Future<Map<String, dynamic>> getData_(String location) async {
-    return data.firstWhere((element) => element["name"] == location,
-        orElse: () =>
-            {});
-  }
-
-  // TODO: describe this function
+  /// Ensures that the [input] is non-null and rounds it to the specified amount of [digits]
   String nullHelper(dynamic input, int digits) {
     if (input.runtimeType == int || input.runtimeType == double) {
       return input.toStringAsFixed(digits);
@@ -56,6 +41,7 @@ class WeatherAPI {
     }
   }
 
+  /// Collates needed data about the specified location
   Future<Map<String, String>> getData(String location) async {
     Map source = data.firstWhere((element) => element["name"] == location,
         orElse: () => {});
@@ -74,51 +60,23 @@ class WeatherAPI {
       "date": DateFormat("d MMM y").format(DateTime.parse(source["obs"]["timestamp"]).toLocal()),
       "time": DateFormat("jm").format(DateTime.parse(source["obs"]["timestamp"]).toLocal()),
     };
-    // print("==o== Output data from $location: $outputData");
     return outputData;
   }
 
-  Future<List<DropdownMenuEntry<String>>> getLocations() async {
-    List<DropdownMenuEntry<String>> outputList = [];
-    for (var location in data) {
-      outputList.add(
-          DropdownMenuEntry(value: location["name"], label: location["name"]));
-    }
-    return outputList;
-  }
-  Future<List<dynamic>> getLocations2() async { // TODO: rename function
+  /// Returns a two lists: a list of [DropdownMenuEntry] and another list with their respective coordinates.
+  Future<List<dynamic>> getDropdownLocations() async { // TODO: rename function
     List<DropdownMenuEntry<String>> entries = [];
     Map<String, LatLng> coords = {};
     for (var location in data) {
       entries.add(
-          DropdownMenuEntry(value: location["name"], label: location["name"]));
+         DropdownMenuEntry(value: location["name"], label: location["name"]));
       coords[location["name"]] = LatLng(location["lat"] ?? 0, location["lon"] ?? 0);
     }
     return [entries, coords];
   }
 
-  Future<List<CircleMarker>> getLocationCoords() async { // TODO: rename function
-    List<CircleMarker> outputCircles = [];
-    // print(data);
-    for (var location in data) {
-      try {
-        LatLng coords = LatLng(location["lat"] ?? 0, location["lon"] ?? 0);
-        CircleMarker circle = CircleMarker(
-          point: coords,
-          radius: 5,
-          borderStrokeWidth: 5,
-          color: Color.lerp(Color.fromRGBO(0xde, 0xeb, 0xf7, 1), Color.fromRGBO(0x08, 0x50, 0x9b, 1), ((location["obs"]["temp"] ?? 0) - 25)/10)!,
-          borderColor: Colors.indigo,
-          hitValue: location["name"],
-        );
-      outputCircles.add(circle);
-      } catch (e) {
-        print("something bad happened with ${location["id"]} : $e");
-      }
-    }
-    return outputCircles;
-  }
-  Future<List<List<CircleMarker>>> getLocationCoords2() async { // TODO: rename function
+  /// Returns four sets of [CircleMarker] for each coordinate, one for each data type
+  Future<List<List<CircleMarker>>> getMapLocations() async { // TODO: rename function
     List<List<CircleMarker>> output = [];
     List types = ["Rain", "Temperature", "Wind", "Pressure"];
     String obs = "";
@@ -171,7 +129,7 @@ class WeatherAPI {
             point: coords,
             radius: 5,
             borderStrokeWidth: isObsNull ? 2 : 5,
-            color: colorHandler(location["obs"][obs], startColor, endColor, minimum, diff),
+            color: colorHelper(location["obs"][obs], startColor, endColor, minimum, diff),
             borderColor: isObsNull ? Colors.black : borderColor,
             hitValue: location["name"],
           );
@@ -185,8 +143,8 @@ class WeatherAPI {
     return output;
   }
 
-  // if value is null, set to black. otherwise, use gradient. TODO: account for values lower than minimum, and higher than maximum
-  Color colorHandler(dynamic value, Color start, Color end, double minimum, double diff) {
+  /// Handles null and out-of-bounds values to be used in the colors for [getMapLocations]
+  Color colorHelper(dynamic value, Color start, Color end, double minimum, double diff) {
     if (value != null) {
       num t = value;
       if (value > minimum + diff) {
@@ -199,6 +157,7 @@ class WeatherAPI {
     return Colors.black.withAlpha(0);
   }
 
+  /// Calculates heat index from a given temperature and relative humidity
   String calcHeatIndex(dynamic temp, dynamic rh) {
     if (temp == null || rh == null) {
       return "n/a";
@@ -262,6 +221,7 @@ class WeatherAPI {
     }
   }
 
+  /// Determines wind direction from angle [wdir]
   String calcWindDirection(dynamic wdir) {
     if (wdir.runtimeType != double && wdir.runtimeType != int) { // TODO: consider erroneous values (e.g. < 0 || > 360)
       return 'n/a';
@@ -299,6 +259,5 @@ class WeatherAPI {
     } else {
       return 'NNW';
     }
-
   }
 }

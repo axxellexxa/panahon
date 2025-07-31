@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:panahon/weather_api.dart';
+import 'package:panahon/WeatherAPI.dart';
+import 'package:flutter/widgets.dart';
 
 class WeatherDataSection extends StatefulWidget {
-  final WeatherAPI weatherAPI;
-  const WeatherDataSection({super.key, required this.weatherAPI});
+  final WeatherAPI weather;
+  const WeatherDataSection({super.key, required this.weather});
 
   @override
   State<WeatherDataSection> createState() =>
-      _WeatherDataSectionState(weather: weatherAPI);
+      _WeatherDataSectionState();
 }
 
 // enum WeatherData { rain, temperature, wind, pressure }
 List<String> WeatherData = ["Rain", "Temperature", "Wind", "Pressure"];
 
 class _WeatherDataSectionState extends State<WeatherDataSection> {
-  WeatherAPI weather;
-  _WeatherDataSectionState({required this.weather});
   String weatherDataView = WeatherData[1];
   late String primaryUnit;
   late String primaryObservation;
@@ -27,7 +25,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
 
   @override
   Widget build(BuildContext context) {
-    switch (weather.selectedDataL.value) {
+    switch (widget.weather.selectedData.value) {
       case "Rain":
         primaryObservation = "rain";
         primaryUnit = "mm";
@@ -65,24 +63,8 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
           spacing: 8,
           children: [
             Expanded(child: Container()),
-            // Container(
-            //   // height: 56,
-            //   decoration: const BoxDecoration(
-            //       color: Color.fromRGBO(238, 237, 244, 1.0),
-            //       borderRadius: BorderRadius.all(Radius.circular(36))),
-            //   child: Padding(
-            //     padding: const EdgeInsets.symmetric(
-            //       vertical: 4,
-            //       horizontal: 16,
-            //     ),
-            //     child: Text(
-            //       weatherDataView,
-            //       textScaler: TextScaler.linear(2.0),
-            //     ),
-            //   ),
-            // ),
             FutureBuilder(
-                future: weather.getData(weather.selectedLocation),
+                future: widget.weather.getData(widget.weather.selectedLocation),
                 builder: (context, snapshot) {
                   Widget leftSection;
                   Widget middleSection;
@@ -129,7 +111,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                               crossAxisAlignment: CrossAxisAlignment.baseline,
                               textBaseline: TextBaseline.alphabetic,
                               children: [
-                                Text((weather.selectedDataL.value != "Pressure") ? snapshot.data![secondaryObservation]! : "a",
+                                Text((widget.weather.selectedData.value != "Pressure") ? snapshot.data![secondaryObservation]! : "a",
                                     textScaler: TextScaler.linear(2)),
                                 Text(secondaryUnit,
                                     textScaler: TextScaler.linear(0.8)),
@@ -163,7 +145,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                       Container(
                         height: 80,
                         decoration: BoxDecoration(
-                          borderRadius: (weather.selectedDataL.value != "Pressure") ?
+                          borderRadius: (widget.weather.selectedData.value != "Pressure") ?
                           BorderRadiusGeometry.circular(16) :
                           BorderRadius.horizontal(
                               left: Radius.circular(16),
@@ -172,7 +154,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                           color: const Color.fromRGBO(238, 237, 244, 1.0),
                         ),
                         child: AnimatedSize(
-                          alignment: Alignment.center,
+                          alignment: Alignment.centerLeft,
                           duration: Duration(milliseconds: animationDuration),
                           child: Center(
                             child: Padding(
@@ -183,10 +165,10 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                         ),
                       ),
                       Container(
-                        height: (weather.selectedDataL.value != "Pressure") ? 80 : 10,
+                        height: (widget.weather.selectedData.value != "Pressure") ? 80 : 10,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.horizontal(
-                            left: Radius.circular((weather.selectedDataL.value != "Pressure") ? 16 : 32),
+                            left: Radius.circular((widget.weather.selectedData.value != "Pressure") ? 16 : 32),
                             right: const Radius.circular(32),
                           ),
                           color: const Color.fromRGBO(238, 237, 244, 1.0),
@@ -196,7 +178,7 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                           duration: Duration(milliseconds: animationDuration),
                           child: Padding(
                             padding: EdgeInsets.symmetric(
-                                vertical: 16, horizontal: (weather.selectedDataL.value != "Pressure") ? 16 : 5),
+                                vertical: 16, horizontal: (widget.weather.selectedData.value != "Pressure") ? 16 : 5),
                             child: rightSection,
                           ),
                         ),
@@ -240,11 +222,10 @@ class _WeatherDataSectionState extends State<WeatherDataSection> {
                     // icon: const Icon(Icons.speed),
                   ),
                 ],
-                selected: <String>{weather.selectedDataL.value},
+                selected: <String>{widget.weather.selectedData.value},
                 onSelectionChanged: (Set<String> newSelection) {
                   setState(() {
-                    // weather.selectedData = newSelection.first;
-                    weather.selectedDataL.value = newSelection.first;
+                    widget.weather.selectedData.value = newSelection.first;
                     weatherDataView = newSelection.first;
                   });
                 },

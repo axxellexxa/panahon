@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'weather_api.dart'; // Import your WeatherMapWidget.dart file
+import 'WeatherAPI.dart'; // Import your WeatherMapWidget.dart file
 import 'package:flutter_map/flutter_map.dart' hide AttributionAlignment;
 import 'package:latlong2/latlong.dart';
 import 'WeatherDataSection.dart';
@@ -25,7 +25,6 @@ class _QuickViewScreenState extends State<QuickViewScreen> with TickerProviderSt
   final TextEditingController locationTextController = TextEditingController();
 
   var weather = WeatherAPI();
-  var weatherData;
 
   final LayerHitNotifier<Object> hitNotifier = ValueNotifier(null);
 
@@ -46,22 +45,8 @@ class _QuickViewScreenState extends State<QuickViewScreen> with TickerProviderSt
     return Scaffold(
       body: Column(
         children: [
-          // FutureBuilder<dynamic>(
-          //   future: weather.getData(selectedLocation, "id"),
-          //   builder: (context, snapshot) {
-          //     if (snapshot.hasData && snapshot.data != "null") {
-          //         return Text(snapshot.data!);
-          //     } else if (snapshot.hasError) {
-          //       return Text('${snapshot.error}');
-          //     }
-          //     return Padding(
-          //       padding: const EdgeInsets.all(8.0),
-          //       child: const CircularProgressIndicator(),
-          //     );
-          //   }
-          // ),
           FutureBuilder(
-              future: weather.getLocations2(),
+              future: weather.getDropdownLocations(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return DropdownMenu(
@@ -80,7 +65,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> with TickerProviderSt
                     onSelected: (location) {
                       _mapController.animateTo(dest: snapshot.data![1][location], zoom: 12);
                       setState(() {
-                        weather.selectedLocation = location.toString(); // TODO: Check if this updates the info section
+                        weather.selectedLocation = location.toString();
                       });
                       FocusManager.instance.primaryFocus?.unfocus();
                     },
@@ -93,13 +78,13 @@ class _QuickViewScreenState extends State<QuickViewScreen> with TickerProviderSt
           Expanded(
             child: Stack(alignment: AlignmentDirectional.center, children: [
               ValueListenableBuilder(
-                valueListenable: weather.selectedDataL,
+                valueListenable: weather.selectedData,
                 builder: (context, value, child) {
                   return FutureBuilder(
-                      future: weather.getLocationCoords2(),
+                      future: weather.getMapLocations(),
                       builder: (context, snapshot) {
                         int selectedCircleIndex = 1;
-                        switch (weather.selectedDataL.value) {
+                        switch (weather.selectedData.value) {
                           case "Rain":
                             selectedCircleIndex = 0;
                             break;
@@ -123,10 +108,6 @@ class _QuickViewScreenState extends State<QuickViewScreen> with TickerProviderSt
                               initialCenter: LatLng(14.599512,
                                   120.984222), // Initial map center (Philippines)
                               minZoom: 0.0, // Initial zoom level
-                              onPositionChanged: (position, bounds) {
-                                // print('Position changed to ${position.center.latitude}, ${position.center.longitude}');
-
-                              },
                             ),
                             children: [
                               TileLayer(
@@ -140,7 +121,6 @@ class _QuickViewScreenState extends State<QuickViewScreen> with TickerProviderSt
                                   final LayerHitResult<Object>? result =
                                       hitNotifier.value;
                                   locationTextController.text = result!.hitValues.first.toString();
-                                  if (result == null) return;
                                   // print('Tapped on ${result.hitValues.first}');
                                   setState(() {
                                     weather.selectedLocation =
@@ -156,7 +136,6 @@ class _QuickViewScreenState extends State<QuickViewScreen> with TickerProviderSt
                                   final LayerHitResult<Object>? result =
                                       hitNotifier.value;
                                   locationTextController.text = result!.hitValues.first.toString();
-                                  if (result == null) return;
                                   // print('Tapped on ${result.hitValues.first}');
                                   setState(() {
                                     weather.selectedLocation =
@@ -172,16 +151,6 @@ class _QuickViewScreenState extends State<QuickViewScreen> with TickerProviderSt
                                     hitNotifier: hitNotifier,
                                     circles: snapshot.data![selectedCircleIndex]),
                               ),
-                              // RichAttributionWidget(
-                              //   popupInitialDisplayDuration: Duration(seconds: 5),
-                              //   attributions: [
-                              //     // Suggested attribution for the OpenStreetMap public tile server
-                              //     TextSourceAttribution(
-                              //       'OpenStreetMap contributors',
-                              //       onTap: () => launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
-                              //     ),
-                              //   ],
-                              // ),
                               CustomAttributionWidget(
                                 popupInitialDisplayDuration: Duration(seconds: 5),
                                 alignment: AttributionAlignment.topRight,
@@ -205,7 +174,7 @@ class _QuickViewScreenState extends State<QuickViewScreen> with TickerProviderSt
                 }
               ),
               Positioned.fill(
-                  bottom: 8, child: WeatherDataSection(weatherAPI: weather)),
+                  bottom: 8, child: WeatherDataSection(weather: weather)),
             ]),
           ),
         ],

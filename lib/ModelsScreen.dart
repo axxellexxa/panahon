@@ -6,7 +6,7 @@ class ModelsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Text("Models"),
+      body: Center(child: Text("Models")),
     );
   }
 }
